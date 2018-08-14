@@ -1,4 +1,4 @@
-import rapidjson
+import strrapidjson as rapidjson
 
 jsonstr = """\
 [

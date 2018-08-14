@@ -1,9 +1,8 @@
-Main contributors
------------------
-- Hideo Hattori (https://github.com/hhatto)
+This is a fork of `pyrapidjson`_.
 
-Patches
--------
-- alingse (https://github.com/alingse)
-- Omer Katz (https://github.com/thedrow)
-- glaweh (https://github.com/glaweh)
+.. _`pyrapidjson`: https://github.com/hhatto/pyrapidjson
+
+Contributors
+------------
+
+- Levon Budagyan

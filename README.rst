@@ -1,31 +1,44 @@
-pyrapidjson
-===========
-.. image:: https://travis-ci.org/hhatto/pyrapidjson.png?branch=master
-   :target: https://travis-ci.org/hhatto/pyrapidjson
-   :alt: Build status
-
+strrapidjson
+============
 
 About
 -----
-pyrapidjson is a wrapper for `rapidjson`_ (JSON parser/generator).
+**strrapidjson** is a fork of the `pyrapidjson`_ library (version 0.5.1), which in turn is a Python 2.7+ wrapper for `rapidjson`_.
+For Python 3+ `python-rapidjson`_ is another alternative.
 
+.. _`pyrapidjson`: https://github.com/hhatto/pyrapidjson
 .. _`rapidjson`: https://github.com/miloyip/rapidjson
+.. _`python-rapidjson`: https://github.com/python-rapidjson/python-rapidjson
+
+Main design goal of this library is to avoid using unicode() conversions in Python 2,
+sticking to (usually UTF8-encoded) str() instead.
+
+* When decoding, library always creates str() objects
+* When encoding, *ensure_ascii=False* is applied by default
+
+There are performance advantages to avoiding conversion to unicode() objects when that is not needed.
+
+Performance-wise, **strrapidjson** is faster than builtin json and comparable to ujson and simplejson.
 
 
 Installation
 ------------
-from pip::
+from pip+Github::
 
-    $ pip install pyrapidjson
+    $ pip install git+https://github.com/aarki/strrapidjson
 
-from easy_install::
 
-    easy_install -ZU pyrapidjson
+clone and run locally (rexcursive to pull rapidjson submodule)::
+
+    $ git clone --recursive https://github.com/aarki/strrapidjson.git
+    $ cd strrapidjson
+    $ python setup.py install
 
 
 Requirements
 ------------
-Python2.7+
+Python2.7.
+Not tested in Python3+ after forking from pyrapidjson
 
 
 Usage
@@ -33,21 +46,17 @@ Usage
 
 basic usage::
 
-    >>> import rapidjson
-    >>> rapidjson.loads('[1, 2, {"test": "hoge"}]')
-    >>> [1, 2, {"test": "hoge"}]
-    >>> rapidjson.dumps([1, 2, {"foo": "bar"}])
+    >>> import strrapidjson
+    >>> strrapidjson.loads('[1, 2, {"test": "hoge"}]')
+    >>> [1, 2, {'test': 'hoge'}]
+    >>> strrapidjson.dumps([1, 2, {"foo": "bar"}])
     '[1,2,{"foo":"bar"}]'
     >>>
 
 
 Links
 -----
-* PyPI_
 * GitHub_
-* `Travis-CI`_
 
-.. _PyPI: http://pypi.python.org/pypi/pyrapidjson/
-.. _GitHub: https://github.com/hhatto/pyrapidjson
-.. _`Travis-CI`: https://travis-ci.org/hhatto/pyrapidjson
+.. _GitHub: https://github.com/aarki/strrapidjson
 

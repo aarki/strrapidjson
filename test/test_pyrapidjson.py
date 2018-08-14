@@ -4,7 +4,7 @@ import os
 import json
 import unittest
 from tempfile import NamedTemporaryFile
-import rapidjson
+import strrapidjson as rapidjson
 
 if sys.version_info < (3, ):
     try:
@@ -67,6 +67,11 @@ class TestDecodeSimple(unittest.TestCase):
         ret = rapidjson.loads(text)
         self.assertEqual(ret, [False, -50.3])
 
+    def test_list_str(self):
+        text = '["a", "b"]'
+        ret = rapidjson.loads(text)
+        self.assertEqual(ret, ["a", "b"])
+
     def test_dict_size_one(self):
         text = """{"20":null}"""
         ret = rapidjson.loads(text)
@@ -77,13 +82,17 @@ class TestDecodeSimple(unittest.TestCase):
         ret = rapidjson.loads(text)
         self.assertEqual(ret, {"hoge": None, "huga": 134})
 
+    def test_dict_str(self):
+        text = """{"a":"b"}"""
+        ret = rapidjson.loads(text)
+        self.assertEqual(ret, {"a": "b"})
+
     def test_unicode(self):
         text = '"は"'
         rapid_ret = rapidjson.loads(text)
         std_ret = json.loads(text)
         self.assertEqual(std_ret, u"は")
-        self.assertEqual(rapid_ret, u"は")
-        self.assertEqual(std_ret, rapid_ret)
+        self.assertEqual(rapid_ret, "は")
 
 
 class TestDecodeComplex(unittest.TestCase):
@@ -106,7 +115,7 @@ class TestDecodeComplex(unittest.TestCase):
     def test_dict_with_unicode(self):
         text = '''{"は": "bc"}'''
         ret = rapidjson.loads(text)
-        self.assertEqual(ret, {u"は": u"bc"})
+        self.assertEqual(ret, {"\xe3\x81\xaf": "bc"})
 
 
 class TestDecodeFail(unittest.TestCase):
@@ -227,6 +236,11 @@ class TestEncodeComplex(unittest.TestCase):
         ret = rapidjson.dumps(jsonobj)
         self.assertEqual(ret, """{"test":[1,"hello"]}""")
 
+    def test_unicode(self):
+        jsonobj = {"test": [1, u"こんにちは"]}
+        ret = rapidjson.dumps(jsonobj)
+        self.assertEqual(ret, """{"test":[1,"\xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf"]}""")
+
 
 class TestFileStream(unittest.TestCase):
 
@@ -311,10 +325,7 @@ class TestFileStream(unittest.TestCase):
         fp.close()
         check_fp = open(fp.name)
         retobj = rapidjson.load(check_fp)
-        if sys.version_info >= (3, ):
-            self.assertEqual(retobj["test"], [1, "こんにちは"])
-        else:
-            self.assertEqual(retobj["test"], [1, u"こんにちは"])
+        self.assertEqual(retobj["test"], [1, "こんにちは"])
         # teardown
         check_fp.close()
         os.remove(fp.name)

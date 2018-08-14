@@ -1,5 +1,5 @@
-import rapidjson
-import json
+import strrapidjson
+
 
 masterobj = {
     "web-app": {
@@ -193,7 +193,7 @@ jsonstr = """
     }
 }
 """
-jsonobj = rapidjson.loads(jsonstr)
+jsonobj = strrapidjson.loads(jsonstr)
 if jsonobj != masterobj:
     print("error!!")
     print(len(jsonobj), len(masterobj))

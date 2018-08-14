@@ -2,14 +2,12 @@ from distutils.core import setup, Extension
 
 
 setup(
-    name='pyrapidjson',
-    version='0.5.1',
-    description='Python Interface for rapidjson(JSON parser and generator).',
+    name='strrapidjson',
+    version='0.1',
+    description='Python 2 interface for rapidjson which does not use unicode objects',
     long_description=open('README.rst').read(),
-    license='Expat License',
-    author='Hideo Hattori',
-    author_email='hhatto.jp@gmail.com',
-    url='https://github.com/hhatto/pyrapidjson',
+    author='Levon Budagyan',
+    url='https://github.com/aarki/strrapidjson',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -22,9 +20,8 @@ setup(
     ],
     keywords='json rapidjson',
     ext_modules=[
-        Extension('rapidjson',
+        Extension('strrapidjson',
                   sources=['pyrapidjson/_pyrapidjson.cpp'],
                   include_dirs=['./pyrapidjson/rapidjson/include/'],
-                  #extra_compile_args=["-DDEBUG"],
                   )]
 )

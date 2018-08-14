@@ -43,11 +43,11 @@ static PyObject* _get_pyobj_from_object(
         const char *key);
 
 /* The module doc strings */
-PyDoc_STRVAR(pyrapidjson__doc__, "Python binding for rapidjson");
-PyDoc_STRVAR(pyrapidjson_loads__doc__, "Decoding JSON");
-PyDoc_STRVAR(pyrapidjson_load__doc__, "Decoding JSON file like object");
-PyDoc_STRVAR(pyrapidjson_dumps__doc__, "Encoding JSON");
-PyDoc_STRVAR(pyrapidjson_dump__doc__, "Encoding JSON file like object");
+PyDoc_STRVAR(strrapidjson__doc__, "Python binding for rapidjson");
+PyDoc_STRVAR(strrapidjson_loads__doc__, "Decoding JSON");
+PyDoc_STRVAR(strrapidjson_load__doc__, "Decoding JSON file like object");
+PyDoc_STRVAR(strrapidjson_dumps__doc__, "Encoding JSON");
+PyDoc_STRVAR(strrapidjson_dump__doc__, "Encoding JSON file like object");
 
 
 static inline bool
@@ -133,17 +133,7 @@ _set_pyobj(PyObject *parent, PyObject *child, const char *key)
         }
     }
     else if (PyDict_Check(parent)) {
-#ifdef PY3
         PyDict_SetItemString(parent, key, child);
-#else
-        PyObject *utf8key;
-        utf8key = PyUnicode_FromString(key);
-        if (!utf8key) {
-            return;
-        }
-        PyDict_SetItem(parent, utf8key, child);
-        Py_DECREF(utf8key);
-#endif
         if (child && child != Py_None) {
             Py_XDECREF(child);
         }
@@ -154,7 +144,7 @@ static PyObject *
 _get_pyobj_from_array(rapidjson::Value::ConstValueIterator& doc,
                       PyObject *root)
 {
-    PyObject *obj, *utf8item;
+    PyObject *obj;
 
     switch (doc->GetType()) {
     case rapidjson::kObjectType:
@@ -178,19 +168,8 @@ _get_pyobj_from_array(rapidjson::Value::ConstValueIterator& doc,
         obj = PyBool_FromLong(0);
         break;
     case rapidjson::kStringType:
-#ifdef PY3
         obj = PyString_FromStringAndSize(doc->GetString(),
                                          doc->GetStringLength());
-#else
-        utf8item = PyUnicode_FromStringAndSize(doc->GetString(),
-                                               doc->GetStringLength());
-        if (utf8item) {
-            obj = utf8item;
-        } else {
-            obj = PyString_FromStringAndSize(doc->GetString(),
-                                         doc->GetStringLength());
-        }
-#endif
         break;
     case rapidjson::kNumberType:
         if (doc->IsDouble()) {
@@ -219,7 +198,7 @@ _get_pyobj_from_object(rapidjson::Value::ConstMemberIterator& doc,
                        PyObject *root,
                        const char *key)
 {
-    PyObject *obj, *utf8item;
+    PyObject *obj;
 
     switch (doc->value.GetType()) {
     case rapidjson::kObjectType:
@@ -243,19 +222,8 @@ _get_pyobj_from_object(rapidjson::Value::ConstMemberIterator& doc,
         obj = PyBool_FromLong(0);
         break;
     case rapidjson::kStringType:
-#ifdef PY3
         obj = PyString_FromStringAndSize(doc->value.GetString(),
                                          doc->value.GetStringLength());
-#else
-        utf8item = PyUnicode_FromStringAndSize(doc->value.GetString(),
-                                               doc->value.GetStringLength());
-        if (utf8item) {
-            obj = utf8item;
-        } else {
-            obj = PyString_FromStringAndSize(doc->value.GetString(),
-                                         doc->value.GetStringLength());
-        }
-#endif
         break;
     case rapidjson::kNumberType:
         if (doc->value.IsDouble()) {
@@ -471,7 +439,8 @@ pyobj2pystring(PyObject *pyjson)
     }
 
     rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType, rapidjson::ASCII<> > writer(buffer);
+    //rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType, rapidjson::ASCII<> > writer(buffer);
+    rapidjson::Writer<rapidjson::StringBuffer, rapidjson::Document::EncodingType > writer(buffer); // ensure_ascii=False
     doc.Accept(writer);
     std::string s = buffer.GetString();
 
@@ -494,17 +463,7 @@ _doc2pyobj(rapidjson::Document& doc, char *text)
         case 'n':
             Py_RETURN_NONE;
         case '"':
-#ifdef PY3
             return PyString_FromStringAndSize(text + 1, strlen(text) - 2);
-#else
-            PyObject *utf8item;
-            utf8item = PyUnicode_FromStringAndSize(text + 1, strlen(text) - 2);
-            if (utf8item) {
-                return utf8item;
-            } else {
-                return PyString_FromStringAndSize(text + 1, strlen(text) - 2);
-            }
-#endif
         default:
             is_float = 0;
             for (offset = 0; offset < strlen(text); offset++) {
@@ -531,7 +490,7 @@ _doc2pyobj(rapidjson::Document& doc, char *text)
 }
 
 static PyObject *
-pyrapidjson_loads(PyObject *self, PyObject *args, PyObject *kwargs)
+strrapidjson_loads(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = {(char *)"text", NULL};
     char *text;
@@ -551,7 +510,7 @@ pyrapidjson_loads(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 
 static PyObject *
-pyrapidjson_load(PyObject *self, PyObject *args, PyObject *kwargs)
+strrapidjson_load(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = {(char *)"text", NULL};
     PyObject *py_file, *py_string, *read_method;
@@ -607,7 +566,7 @@ pyrapidjson_load(PyObject *self, PyObject *args, PyObject *kwargs)
 
 
 static PyObject *
-pyrapidjson_dumps(PyObject *self, PyObject *args, PyObject *kwargs)
+strrapidjson_dumps(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     static char *kwlist[] = {(char *)"obj", NULL};
     PyObject *pyjson;
@@ -621,7 +580,7 @@ pyrapidjson_dumps(PyObject *self, PyObject *args, PyObject *kwargs)
 
 
 static PyObject *
-pyrapidjson_dump(PyObject *self, PyObject *args, PyObject *kwargs)
+strrapidjson_dump(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     // TODO: not support kwargs like json.dump() (encoding, etc...)
     static char *kwlist[] = {(char *)"obj", (char *)"fp", NULL};
@@ -672,43 +631,43 @@ pyrapidjson_dump(PyObject *self, PyObject *args, PyObject *kwargs)
     Py_RETURN_NONE;
 }
 
-static PyMethodDef PyrapidjsonMethods[] = {
-    {"loads", (PyCFunction)pyrapidjson_loads, METH_VARARGS | METH_KEYWORDS,
-     pyrapidjson_loads__doc__},
-    {"load", (PyCFunction)pyrapidjson_load, METH_VARARGS | METH_KEYWORDS,
-     pyrapidjson_load__doc__},
-    {"dumps", (PyCFunction)pyrapidjson_dumps, METH_VARARGS | METH_KEYWORDS,
-     pyrapidjson_dumps__doc__},
-    {"dump", (PyCFunction)pyrapidjson_dump, METH_VARARGS | METH_KEYWORDS,
-     pyrapidjson_dump__doc__},
+static PyMethodDef StrrapidjsonMethods[] = {
+    {"loads", (PyCFunction)strrapidjson_loads, METH_VARARGS | METH_KEYWORDS,
+     strrapidjson_loads__doc__},
+    {"load", (PyCFunction)strrapidjson_load, METH_VARARGS | METH_KEYWORDS,
+     strrapidjson_load__doc__},
+    {"dumps", (PyCFunction)strrapidjson_dumps, METH_VARARGS | METH_KEYWORDS,
+     strrapidjson_dumps__doc__},
+    {"dump", (PyCFunction)strrapidjson_dump, METH_VARARGS | METH_KEYWORDS,
+     strrapidjson_dump__doc__},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
 #ifdef PY3
-static struct PyModuleDef pyrapidjson_module_def = {
+static struct PyModuleDef strrapidjson_module_def = {
     PyModuleDef_HEAD_INIT,
-    "rapidjson",
-    pyrapidjson__doc__,
+    "strrapidjson",
+    strrapidjson__doc__,
     -1,
-    PyrapidjsonMethods,
+    StrrapidjsonMethods,
 };
 
 PyMODINIT_FUNC
-PyInit_rapidjson(void)
+PyInit_strrapidjson(void)
 #else
 
 PyMODINIT_FUNC
-initrapidjson(void)
+initstrrapidjson(void)
 #endif
 {
     PyObject *module;
 
 #ifdef PY3
-    module = PyModule_Create(&pyrapidjson_module_def);
+    module = PyModule_Create(&strrapidjson_module_def);
     return module;
 #else
     /* The module */
-    module = Py_InitModule3("rapidjson", PyrapidjsonMethods, pyrapidjson__doc__);
+    module = Py_InitModule3("strrapidjson", StrrapidjsonMethods, strrapidjson__doc__);
     if (module == NULL)
         return;
 #endif
