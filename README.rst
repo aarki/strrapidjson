@@ -18,11 +18,17 @@ sticking to (usually UTF8-encoded) str() instead.
 
 There are performance advantages to avoiding conversion to unicode() objects when that is not needed.
 
-Performance-wise, **strrapidjson** is faster than builtin json and comparable to ujson and simplejson.
+Performance-wise, **strrapidjson** is faster than the standard library **json** module and comparable
+to **ujson** and **simplejson** packages.
 
 
 Installation
 ------------
+from pip::
+
+    $ pip install strrapidjson
+
+
 from pip+Github::
 
     $ pip install git+https://github.com/aarki/strrapidjson
@@ -44,7 +50,9 @@ Not tested in Python3+ after forking from pyrapidjson
 Usage
 -----
 
-basic usage::
+Drop-in replacement for Python **json** module although function arguments to **dump**/**load** are not supported.
+
+Example::
 
     >>> import strrapidjson
     >>> strrapidjson.loads('[1, 2, {"test": "hoge"}]')
@@ -56,7 +64,9 @@ basic usage::
 
 Links
 -----
+* PyPI_
 * GitHub_
 
+.. _PyPI: https://pypi.org/project/strrapidjson/
 .. _GitHub: https://github.com/aarki/strrapidjson
 
