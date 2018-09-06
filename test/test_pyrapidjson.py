@@ -208,6 +208,16 @@ class TestEncodeSimple(unittest.TestCase):
         ret = rapidjson.dumps(invalid_jsonobj)
         self.assertEqual(ret, """{"-1.99":1}""")
 
+    def test_dict_with_int_keys(self):
+        jsonobj = {1393: '50724', 2692: 50724}
+        ret = rapidjson.dumps(jsonobj)
+        self.assertEqual(ret, '{"1393":"50724","2692":50724}')
+        ret = rapidjson.dumps(jsonobj)
+        self.assertEqual(ret, '{"1393":"50724","2692":50724}')
+        # Used to segfault here because of extra dereferencing
+        ret = rapidjson.dumps(jsonobj)
+        self.assertEqual(ret, '{"1393":"50724","2692":50724}')
+
 
 class TestEncodeComplex(unittest.TestCase):
 

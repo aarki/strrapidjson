@@ -65,7 +65,7 @@ pyobj2doc_pair(PyObject *key, PyObject *value,
     rapidjson::Value s;
     s.SetString(key_string, root.GetAllocator());
     rapidjson::Value _v;
-    if (false == pyobj2doc(value, _v, root)) {
+    if (!pyobj2doc(value, _v, root)) {
         return false;
     }
     doc.AddMember(s, _v, root.GetAllocator());
@@ -81,7 +81,7 @@ pyobj2doc_pair(PyObject *key, PyObject *value, rapidjson::Document& doc)
     if (!PyUnicode_Check(key)) {
         pyobj = PyObject_Str(key);
         if (pyobj == NULL) {
-            PyErr_SetString(PyExc_TypeError, "not support key type");
+            PyErr_SetString(PyExc_TypeError, "unsupported key type");
             return false;
         }
         utf8_item = PyUnicode_AsUTF8String(pyobj);
@@ -98,10 +98,9 @@ pyobj2doc_pair(PyObject *key, PyObject *value, rapidjson::Document& doc)
     } else {
         PyObject *pyobj = PyObject_Str(key);
         if (pyobj == NULL) {
-            PyErr_SetString(PyExc_TypeError, "not support key type");
+            PyErr_SetString(PyExc_TypeError, "unsupported key type");
             return false;
         }
-        Py_DECREF(key);
         key_string = PyString_AsString(pyobj);
     }
 #endif
@@ -112,7 +111,7 @@ pyobj2doc_pair(PyObject *key, PyObject *value, rapidjson::Document& doc)
     Py_XDECREF(utf8_item);
 
     rapidjson::Value _v;
-    if (false == pyobj2doc(value, _v, doc)) {
+    if (!pyobj2doc(value, _v, doc)) {
         return false;
     }
     doc.AddMember(s, _v, doc.GetAllocator());
@@ -313,7 +312,7 @@ pyobj2doc(PyObject *object, rapidjson::Value& doc, rapidjson::Document& root)
         rapidjson::Value _v;
         for (i = 0; i < len; ++i) {
             PyObject *elm = PyTuple_GetItem(object, i);
-            if (false == pyobj2doc(elm, _v, root)) {
+            if (!pyobj2doc(elm, _v, root)) {
                 return false;
             }
             doc.PushBack(_v, root.GetAllocator());
@@ -326,7 +325,7 @@ pyobj2doc(PyObject *object, rapidjson::Value& doc, rapidjson::Document& root)
         rapidjson::Value _v;
         for (i = 0; i < len; ++i) {
             PyObject *elm = PyList_GetItem(object, i);
-            if (false == pyobj2doc(elm, _v, root)) {
+            if (!pyobj2doc(elm, _v, root)) {
                 return false;
             }
             doc.PushBack(_v, root.GetAllocator());
@@ -337,7 +336,7 @@ pyobj2doc(PyObject *object, rapidjson::Value& doc, rapidjson::Document& root)
         PyObject *key, *value;
         Py_ssize_t pos = 0;
         while (PyDict_Next(object, &pos, &key, &value)) {
-            if (false == pyobj2doc_pair(key, value, doc, root)) {
+            if (!pyobj2doc_pair(key, value, doc, root)) {
                 return false;
             }
         }
@@ -393,7 +392,7 @@ pyobj2doc(PyObject *object, rapidjson::Document& doc)
         rapidjson::Value _v;
         for (i = 0; i < len; ++i) {
             PyObject *elm = PyTuple_GetItem(object, i);
-            if (false == pyobj2doc(elm, _v, doc)) {
+            if (!pyobj2doc(elm, _v, doc)) {
                 return false;
             }
             doc.PushBack(_v, doc.GetAllocator());
@@ -405,7 +404,7 @@ pyobj2doc(PyObject *object, rapidjson::Document& doc)
         rapidjson::Value _v;
         for (i = 0; i < len; ++i) {
             PyObject *elm = PyList_GetItem(object, i);
-            if (false == pyobj2doc(elm, _v, doc)) {
+            if (!pyobj2doc(elm, _v, doc)) {
                 return false;
             }
             doc.PushBack(_v, doc.GetAllocator());
@@ -416,7 +415,7 @@ pyobj2doc(PyObject *object, rapidjson::Document& doc)
         PyObject *key, *value;
         Py_ssize_t pos = 0;
         while (PyDict_Next(object, &pos, &key, &value)) {
-            if (false == pyobj2doc_pair(key, value, doc)) {
+            if (!pyobj2doc_pair(key, value, doc)) {
                 return false;
             }
         }
@@ -434,7 +433,7 @@ pyobj2pystring(PyObject *pyjson)
 {
     rapidjson::Document doc;
 
-    if (false == pyobj2doc(pyjson, doc)) {
+    if (!pyobj2doc(pyjson, doc)) {
         return NULL;
     }
 
