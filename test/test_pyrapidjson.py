@@ -251,6 +251,26 @@ class TestEncodeComplex(unittest.TestCase):
         ret = rapidjson.dumps(jsonobj)
         self.assertEqual(ret, """{"test":[1,"\xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf"]}""")
 
+    def test_unicode_key(self):
+        jsonobj = {"test": {u"こんにちは": 1}}
+        ret = rapidjson.dumps(jsonobj)
+        self.assertEqual(ret, """{"test":{"\xe3\x81\x93\xe3\x82\x93\xe3\x81\xab\xe3\x81\xa1\xe3\x81\xaf":1}}""")
+
+    def test_dict_with_none_key(self):
+        jsonobj = {None: "none"}
+        # ret = rapidjson.dumps(jsonobj)
+        # self.assertEqual(ret, """{"None":"none"}""")
+        with self.assertRaises(TypeError):
+            rapidjson.dumps(jsonobj)
+
+    def test_dict_in_dict_with_none_key(self):
+        jsonobj = {"test": {None: "none"}}
+        # ret = rapidjson.dumps(jsonobj)
+        # self.assertEqual(ret, """{"test":{"None":"none"}}""")
+
+        with self.assertRaises(TypeError):
+            rapidjson.dumps(jsonobj)
+
 
 class TestFileStream(unittest.TestCase):
 

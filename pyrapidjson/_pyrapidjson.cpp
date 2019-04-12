@@ -55,15 +55,36 @@ pyobj2doc_pair(PyObject *key, PyObject *value,
                rapidjson::Value& doc, rapidjson::Document& root)
 {
     const char *key_string;
+    PyObject *utf8_item = NULL;
 #ifdef PY3
-    PyObject *utf8_item;
     utf8_item = PyUnicode_AsUTF8String(key);
     key_string = PyBytes_AsString(utf8_item);
 #else
-    key_string = PyString_AsString(key);
+    if ( key == Py_None ) {
+        PyErr_SetString(PyExc_TypeError, "key is None");
+        return false;
+    }
+
+    if (PyString_Check(key)) {
+        key_string = PyString_AsString(key);
+    } else if (PyUnicode_Check(key)) {
+        utf8_item = PyUnicode_AsUTF8String(key);
+        key_string = PyBytes_AsString(utf8_item);
+    } else {
+        PyObject *pyobj = PyObject_Str(key);
+        if (pyobj == NULL) {
+            PyErr_SetString(PyExc_TypeError, "unsupported key type");
+            return false;
+        }
+        key_string = PyString_AsString(pyobj);
+        Py_XDECREF(pyobj);
+    }
 #endif
     rapidjson::Value s;
     s.SetString(key_string, root.GetAllocator());
+
+    Py_XDECREF(utf8_item);
+
     rapidjson::Value _v;
     if (!pyobj2doc(value, _v, root)) {
         return false;
@@ -90,13 +111,18 @@ pyobj2doc_pair(PyObject *key, PyObject *value, rapidjson::Document& doc)
     }
     key_string = PyBytes_AsString(utf8_item);
 #else
+    if ( key == Py_None ) {
+        PyErr_SetString(PyExc_TypeError, "key is None");
+        return false;
+    }
+
     if (PyString_Check(key)) {
         key_string = PyString_AsString(key);
     } else if (PyUnicode_Check(key)) {
         utf8_item = PyUnicode_AsUTF8String(key);
         key_string = PyBytes_AsString(utf8_item);
     } else {
-        PyObject *pyobj = PyObject_Str(key);
+        pyobj = PyObject_Str(key);
         if (pyobj == NULL) {
             PyErr_SetString(PyExc_TypeError, "unsupported key type");
             return false;
