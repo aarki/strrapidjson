@@ -2,7 +2,7 @@ from setuptools import setup, Extension
 
 setup(
     name='strrapidjson',
-    version='0.2',
+    version='0.3',
     description='Python 2 rapidjson wrapper that does not use unicode objects',
     long_description=open('README.rst').read(),
     license='MIT',
